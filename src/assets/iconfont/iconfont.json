@@ -1,0 +1,23 @@
+{
+  "id": "2859992",
+  "name": "12",
+  "font_family": "iconfont",
+  "css_prefix_text": "icon-",
+  "description": "",
+  "glyphs": [
+    {
+      "icon_id": "813705",
+      "name": "微信",
+      "font_class": "weixin",
+      "unicode": "e62b",
+      "unicode_decimal": 58923
+    },
+    {
+      "icon_id": "7568878",
+      "name": "24gf-phoneLoudspeaker",
+      "font_class": "24gf-phoneLoudspeaker",
+      "unicode": "e969",
+      "unicode_decimal": 59753
+    }
+  ]
+}
