@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <header>
-      <img src="./assets/img/nav.jpg" alt="">
+      <img src="./assets/img/nav.jpg" alt="" @click="tab(1)">
     </header>
     <section>
       <!-- 轮播1 -->
@@ -39,7 +39,8 @@
         <img src="./assets/img/case2.png" alt="">
         <div class="content">
           <div class="showcase">
-            <a v-for="(item,index) in caseList" :class="{'active-case':index===activeCase}" :href="item.link"
+            <a v-for="(item,index) in caseList" :class="{'active-case':index===activeCase}" href="javascript:;"
+               @click="jumpLink(item.video || item.link, !!item.video)"
                :key="item.name">
               <img :src="item.img" alt="">
               <div>{{ item.name }}</div>
@@ -118,74 +119,124 @@
         <div class="copy">重庆瞰图科技有限公司</div>
       </div>
     </section>
-    <!--      <section class="zhan"></section>-->
-    <!--      <footer>-->
-    <!--        <div :class="flag?'wechat active':'wechat'" @click="tab()">-->
-    <!--          <i class="iconfont">&#xe62b;</i>-->
-    <!--          <span>微信</span>-->
-    <!--        </div>-->
-    <!--        <div  :class="flag?'tel':'tel active'" @click="tab()">-->
-    <!--          <i class="iconfont">&#xe969;</i>-->
-    <!--          <span>电话</span>-->
-    <!--        </div>-->
-    <!--      </footer>-->
+    <section class="zhan"></section>
+    <footer>
+      <div class="wechat active" @click="tab(0)" ref="telNumber" data-clipboard-target="#tel_num">
+        <i class="iconfont">&#xe62b;</i>
+        <span>微信</span>
+      </div>
+      <div class="tel" @click="tab(1)">
+        <i class="iconfont">&#xe969;</i>
+        <span>电话</span>
+      </div>
+    </footer>
+
+    <input type="text" value="15826089334" id="tel_num" style="visibility: hidden;width:10vh;">
+
+    <van-overlay :show="showVideoMask" z-index="2147483647" @click="showVideoMask=false">
+      <div class="video-box" @click.stop>
+        <video class="video" :src="videoSrc" controls></video>
+      </div>
+    </van-overlay>
   </div>
 </template>
 
 <script>
 import Vue from 'vue';
-import {Swipe, SwipeItem} from 'vant';
+import {Swipe, SwipeItem, Overlay} from 'vant';
+import ClipboardJS from 'clipboard'
 
 Vue.use(Swipe);
 Vue.use(SwipeItem);
+Vue.use(Overlay)
 
 export default {
   name: 'App',
   data() {
     return {
       flag: true,
-      caseList: [{
-        link: 'https://kantu3d.com/demo/2109/demoAll/dist/pages/september21/mercuryStation/',
-        img: require('./assets/img/example5.jpg'),
-        name: '水汞站'
-      },
-        {
-          link: 'https://kantu3d.com/demo/2109/demoAll/dist/pages/september21/photovoltaic/',
-          img: require('./assets/img/example6.jpg'),
-          name: '光伏园区'
-        },
-        {
-          link: 'https://kantu3d.com/demo/2109/demoAll/dist/pages/september21/energy/',
-          img: require('./assets/img/example7.jpg'),
-          name: '风力发电'
-        },
+      caseList: [
         {
           link: 'https://kantu3d.com/demo/2109/demoAll/dist/pages/september21/logistics/',
           img: require('./assets/img/example8.jpg'),
           name: '智慧物流'
+        }, {
+          link: 'https://kantu3d.com/demo/2109/demoAll/dist/pages/september21/mercuryStation/',
+          img: require('./assets/img/example5.jpg'),
+          name: '水汞站'
         },
         {
-          link: 'https://kantu3d.com/demo/2109/demoAll/dist/pages/september21/equipment/',
-          img: require('./assets/img/example9.jpg'),
-          name: '智能设备'
+          link: 'https://kantu3d.com/demo/2110/generator/',
+          img: require('./assets/img/example12.png'),
+          name: '发电机'
         },
         {
-          link: 'https://kantu3d.com/demo/2109/demoAll/dist/pages/september21/gas/',
-          img: require('./assets/img/example10.jpg'),
-          name: '智能加油站'
+          video: 'https://kantu3d.com/videos/smartPark.mp4',
+          img: require('./assets/img/example1.jpg'),
+          name: '智慧园区'
+        },
+        {
+          video: 'https://kantu3d.com/videos/factory.mp4',
+          img: require('./assets/img/example2.jpg'),
+          name: '智慧工厂'
+        },
+        {
+          video: 'https://kantu3d.com/videos/dataCenter.mp4',
+
+          img: require('./assets/img/example16.png'),
+          name: '机房可视化'
+        },
+        {
+          video: 'https://kantu3d.com/videos/energy.mp4',
+          img: require('./assets/img/example7.jpg'),
+          name: '风力发电'
+        },
+        {
+          video: 'https://kantu3d.com/videos/IntelligentBuilding.mp4',
+
+          img: require('./assets/img/example13.png'),
+          name: '智慧楼宇'
+        },
+        {
+          video: 'https://kantu3d.com/videos/substation.mp4',
+          img: require('./assets/img/example4.jpg'),
+          name: '变电站'
         }],
       activeCase: 0,
-      caseTimer: null
+      caseTimer: null,
+      showVideoMask: false,
+      videoSrc: ''
     };
   },
   mounted() {
+    let clip = new ClipboardJS(this.$refs.telNumber)
+    clip.on('success', () => {
+      alert('复制成功微信 15826089334 成功')
+      window.open('weixin://', '_self')
+    })
+
     this.caseTimer = setInterval(() => {
       this.activeCase === this.caseList.length - 1 ? this.activeCase = 0 : this.activeCase++
     }, 1000)
   },
   methods: {
-    tab() {
-      this.flag = !this.flag
+    tab(index) {
+      switch (index) {
+        case 0:
+          break
+        case 1:
+          window.open('tel:18983920157', '_self')
+      }
+    },
+    // eslint-disable-next-line no-unused-vars
+    jumpLink(link, isVideo) {
+      if (isVideo) {
+        this.videoSrc = link;
+        this.showVideoMask = true
+      } else {
+        // 跳转链接
+        window.open(link,'_self')
+      }
     }
   },
   beforeDestroy() {
@@ -209,12 +260,12 @@ header img {
 }
 
 .case {
-  height: 1300px;
+  /*height: 1300px;*/
 }
 
 .case .showcase {
   width: 690px;
-  height: 554px;
+  height: 874px;
   margin: auto;
   display: flex;
   flex-wrap: wrap;
@@ -227,7 +278,7 @@ header img {
   height: 265px;
   flex-direction: column;
   text-decoration: none;
-    box-sizing: border-box;
+  box-sizing: border-box;
 }
 
 .showcase a img {
@@ -289,7 +340,7 @@ header img {
 
 /* 底部 */
 .zhan {
-  height: 110px;
+  /*height: 110px;*/
 }
 
 footer {
@@ -306,8 +357,8 @@ footer {
 
 .wechat, .tel {
   width: 333px;
-  height: 68px;
-  border-radius: 34px;
+  height: 80px;
+  border-radius: 40px;
   border: 1px solid #fe7235;
   font-size: 28px;
   color: #fe7235;
@@ -327,5 +378,21 @@ footer {
 
 .wechat span, .tel span {
   margin-left: 10px;
+}
+
+.video-box {
+  box-sizing: border-box;
+  position: relative;
+  top: 50%;
+  left: 50%;
+  width: 80vw;
+  padding: 15px 10px;
+  transform: translate(-50%,-70%);
+  background: #FFF;
+}
+
+.video {
+  width: 100%;
+  vertical-align: bottom;
 }
 </style>
